@@ -11,7 +11,6 @@ def choose_warrior_name():
         else:
             print("Let's choose another name.")
 
-
 def define_warrior_abilities():
     return {
         "Attack Power": {"points": 1, "description": "Determines your damage output in battle."},
@@ -21,6 +20,32 @@ def define_warrior_abilities():
         "Health": {"points": 50, "description": "Represents your life points in battle."},
         "Luck": {"points": 1, "description": "Influences critical hit rates and rare loot drops."}
     }
+def create_player():
+    """ Creates a player with initial attributes including gold, XP, and level. """
+    return {
+        "name": choose_warrior_name(),
+        "abilities": define_warrior_abilities(),
+        "gold": 0,
+        "xp": 0,
+        "level": 1
+    }
+
+
+
+def check_level_up(player):
+    """ Checks if the player has enough XP to level up. """
+    level = player["level"]
+    xp_needed = level * 50  # XP required for next level (50 XP per level)
+
+    if player["xp"] >= xp_needed:
+        player["level"] += 1
+        player["xp"] -= xp_needed  # Remove XP used for leveling up
+        print(f"\n🎉 {player['name']} leveled up to Level {player['level']}!")
+
+        # Give player extra ability points
+        bonus_points = 3
+        print(f"You received {bonus_points} ability points to distribute!")
+        distribute_skill_points(player["abilities"], bonus_points)
 
 
 def distribute_skill_points(abilities):
