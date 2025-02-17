@@ -3,6 +3,7 @@ import random
 
 from game.player import define_warrior_abilities
 from game.player import check_level_up
+from game.player import choose_special_ability
 
 class Enemy:
     """ Represents an enemy with health and attack power. """
@@ -15,8 +16,19 @@ class Enemy:
         """ Returns the enemy's attack damage. """
         return random.randint(1, self.attack_power)
 
-def get_random_enemy():
-    """ Returns a random enemy from the enemy list. """
+
+class Boss(Enemy):
+    """ Represents a powerful boss enemy. """
+
+    def __init__(self):
+        super().__init__("Dark Lord", health=100, attack_power=15)
+
+
+def get_random_enemy(is_boss=False):
+    """ Returns a random enemy from the enemy list or a boss. """
+    if is_boss:
+        return Boss()
+
     enemies = [
         Enemy("Goblin", health=30, attack_power=5),
         Enemy("Orc", health=50, attack_power=8),
@@ -26,45 +38,53 @@ def get_random_enemy():
     return random.choice(enemies)
 
 
-def battle(player):
-    """ Asks the player if they want to fight, then manages the battle. """
-    enemy = get_random_enemy()
+def battle(player, is_boss=False):
+    """ Handles battles, including boss fights. """
+    enemy = get_random_enemy(is_boss)
     player_health = player["abilities"]["Health"]["points"]
     player_attack = player["abilities"]["Attack Power"]["points"]
 
-    print(f"\n⚔️ {player['name']} encounters a {enemy.name}!")
+    print(f"\n⚔️ {player['name']} encounters {'the mighty' if is_boss else 'a'} {enemy.name}!")
     print(f"The battle begins! {enemy.name} has {enemy.health} HP. You have {player_health} HP.")
+    time.sleep(1)
 
-    while True:
-        print("\nDo you want to fight or leave?")
-        print("1 - Fight")
-        print("2 - Leave")
-        choice = input("Enter your choice: ")
-
-        if choice == "1":
-            print("The battle begins!")
-            time.sleep(1)
-            break
-        elif choice == "2":
-            print("🏃‍♂️ You decided to leave and avoid the fight.")
-            return
-        else:
-            print("Invalid choice! Please enter 1 to fight or 2 to leave.")
+    special_ability = choose_special_ability()  # Hráč si vyberie špeciálnu schopnosť
+    ability_used = False  # Sleduje, či hráč schopnosť už použil
 
     while player_health > 0 and enemy.health > 0:
-        # Player attacks
-        damage = random.randint(1, player_attack)
+        print("\nChoose an action:")
+        print("1 - Normal Attack")
+        print("2 - Use Special Ability" if not ability_used else "❌ Special Ability Used")
+
+        action_choice = input("Enter your choice: ")
+
+        if action_choice == "2" and not ability_used:
+            if special_ability["effect"] == "double_attack":
+                damage = random.randint(1, player_attack) * 2
+                print("💥 You unleash a powerful strike!")
+            elif special_ability["effect"] == "heal":
+                player_health += 20
+                print("✨ You healed yourself for 20 HP!")
+                damage = 0  # Healing does not attack
+            elif special_ability["effect"] == "critical_hit":
+                damage = player_attack * 2
+                print("🎯 You land a critical hit!")
+
+            ability_used = True  # Označíme schopnosť ako použitú
+        else:
+            damage = random.randint(1, player_attack)
+
         enemy.health -= damage
-        print(f"💥 You hit the {enemy.name} for {damage} damage! {enemy.name} has {max(0, enemy.health)} HP left.")
+        print(f"💥 You hit {enemy.name} for {damage} damage! {enemy.name} has {max(0, enemy.health)} HP left.")
         time.sleep(1)
 
         if enemy.health <= 0:
-            print(f"🏆 You defeated the {enemy.name}!")
+            print(f"🏆 You defeated {enemy.name}!")
             time.sleep(1)
 
             # Reward the player
-            gold_reward = random.randint(5, 20)
-            xp_reward = random.randint(10, 30)
+            gold_reward = random.randint(10, 50) if is_boss else random.randint(5, 20)
+            xp_reward = random.randint(30, 100) if is_boss else random.randint(10, 30)
             player["gold"] += gold_reward
             player["xp"] += xp_reward
 
@@ -78,7 +98,7 @@ def battle(player):
         # Enemy attacks
         enemy_damage = enemy.attack()
         player_health -= enemy_damage
-        print(f"🔥 The {enemy.name} hits you for {enemy_damage} damage! You have {max(0, player_health)} HP left.")
+        print(f"🔥 {enemy.name} hits you for {enemy_damage} damage! You have {max(0, player_health)} HP left.")
         time.sleep(1)
 
         if player_health <= 0:

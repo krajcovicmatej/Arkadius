@@ -46,6 +46,25 @@ def check_level_up(player):
         bonus_points = 3
         print(f"You received {bonus_points} ability points to distribute!")
         distribute_skill_points(player["abilities"], bonus_points)
+def choose_special_ability():
+    """ Allows the player to choose a special ability. """
+    abilities = {
+        "1": {"name": "Power Strike", "effect": "double_attack", "description": "Deals double damage in one attack."},
+        "2": {"name": "Healing Light", "effect": "heal", "description": "Restores 20 HP."},
+        "3": {"name": "Lucky Shot", "effect": "critical_hit", "description": "Guaranteed critical hit."}
+    }
+
+    print("\n✨ Choose a special ability:")
+    for key, ability in abilities.items():
+        print(f"{key} - {ability['name']}: {ability['description']}")
+
+    while True:
+        choice = input("Enter the number of your ability: ")
+        if choice in abilities:
+            print(f"🎖️ You chose {abilities[choice]['name']}!")
+            return abilities[choice]
+        else:
+            print("Invalid choice! Please enter a valid number.")
 
 
 def distribute_skill_points(abilities):
