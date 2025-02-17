@@ -1,4 +1,8 @@
 # game_loop.py - Controls game flow
+from constants import INTRO, NAME, DISTRIBUTE_ABILITIES, END
+from game.player import choose_warrior_name, define_warrior_abilities, distribute_skill_points
+
+
 def game_loop():
     current_phase = INTRO
     name = ""
@@ -6,7 +10,7 @@ def game_loop():
 
     while current_phase != END:
         if current_phase == INTRO:
-            print("Welcome to the Text Adventure RPG!")
+            print("Welcome to the Arkadius --> Text Adventure RPG!")
             print("You will create your own warrior and fight against powerful monsters.")
             input("Press Enter to continue...")
             current_phase = NAME
