@@ -21,14 +21,19 @@ def define_warrior_abilities():
         "Luck": {"points": 1, "description": "Influences critical hit rates and rare loot drops."}
     }
 def create_player():
-    """ Creates a player with initial attributes including gold, XP, and level. """
+    """ Creates a player with initial attributes including gold, XP, level, and inventory. """
     return {
         "name": choose_warrior_name(),
         "abilities": define_warrior_abilities(),
         "gold": 0,
         "xp": 0,
-        "level": 1
+        "level": 1,
+        "inventory": {
+            "weapon": {"name": "Fists", "attack_bonus": 0},
+            "armor": {"name": "Basic Clothes", "defense_bonus": 0}
+        }
     }
+
 
 
 

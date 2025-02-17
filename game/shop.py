@@ -4,10 +4,11 @@ def shop(player):
     print(f"You have {player['gold']} gold.")
 
     items = {
-        "1": {"name": "Increase Attack Power (+1)", "cost": 10, "stat": "Attack Power", "value": 1},
-        "2": {"name": "Increase Defense (+1)", "cost": 10, "stat": "Defense", "value": 1},
-        "3": {"name": "Increase Health (+10)", "cost": 15, "stat": "Health", "value": 10},
-        "4": {"name": "Exit shop", "cost": 0}
+        "1": {"name": "Iron Sword", "cost": 15, "type": "weapon", "attack_bonus": 3},
+        "2": {"name": "Steel Sword", "cost": 30, "type": "weapon", "attack_bonus": 5},
+        "3": {"name": "Leather Armor", "cost": 20, "type": "armor", "defense_bonus": 2},
+        "4": {"name": "Chainmail", "cost": 40, "type": "armor", "defense_bonus": 5},
+        "5": {"name": "Exit shop", "cost": 0}
     }
 
     while True:
@@ -18,16 +19,20 @@ def shop(player):
         choice = input("Enter the number of the item you want to buy: ")
 
         if choice in items:
-            if choice == "4":
+            if choice == "5":
                 print("👋 You leave the shop.")
                 break
 
             item = items[choice]
             if player["gold"] >= item["cost"]:
                 player["gold"] -= item["cost"]
-                player["abilities"][item["stat"]]["points"] += item["value"]
-                print(
-                    f"🎉 You bought {item['name']}! Your {item['stat']} is now {player['abilities'][item['stat']]['points']}.")
+
+                if item["type"] == "weapon":
+                    player["inventory"]["weapon"] = {"name": item["name"], "attack_bonus": item["attack_bonus"]}
+                elif item["type"] == "armor":
+                    player["inventory"]["armor"] = {"name": item["name"], "defense_bonus": item["defense_bonus"]}
+
+                print(f"🎉 You bought {item['name']}!")
             else:
                 print("❌ You don't have enough gold!")
 
