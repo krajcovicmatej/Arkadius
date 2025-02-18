@@ -29,11 +29,12 @@ def create_player():
         "xp": 0,
         "level": 1,
         "inventory": {
-            "weapon": {"name": "Fists", "attack_bonus": 0},
-            "armor": {"name": "Basic Clothes", "defense_bonus": 0}
+            "weapons": [],
+            "armor": [],
+            "potions": [],
+            "special": []
         }
     }
-
 
 
 

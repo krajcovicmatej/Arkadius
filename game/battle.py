@@ -1,8 +1,11 @@
 import random
 import time
+from game.loot import award_loot
+
 
 class Enemy:
     """ Represents an enemy with health, attack power, and special ability. """
+
     def __init__(self, name, health, attack_power, xp_reward, gold_reward, special_ability):
         self.name = name
         self.health = health
@@ -14,6 +17,7 @@ class Enemy:
     def attack(self):
         """ Returns the enemy's attack damage. """
         return random.randint(1, self.attack_power)
+
 
 def get_random_enemy(is_boss=False):
     """ Returns a random enemy with a special ability or a boss. """
@@ -29,29 +33,9 @@ def get_random_enemy(is_boss=False):
     ]
     return random.choice(enemies)
 
-def choose_special_ability():
-    """ Allows the player to choose a special battle ability. """
-    abilities = {
-        "1": {"name": "Power Strike", "effect": "double_attack", "description": "Random chance to deal double damage."},
-        "2": {"name": "Defensive Stance", "effect": "reduce_damage",
-              "description": "Random chance to take half damage."},
-        "3": {"name": "Frenzy", "effect": "extra_hit", "description": "Random chance to strike twice in one turn."}
-    }
-
-    print("\n✨ Choose your special battle ability:")
-    for key, ability in abilities.items():
-        print(f"{key} - {ability['name']}: {ability['description']}")
-
-    while True:
-        choice = input("Enter the number of your ability: ")
-        if choice in abilities:
-            print(f"🎖️ You chose {abilities[choice]['name']}!")
-            return abilities[choice]
-        else:
-            print("Invalid choice! Please enter a valid number.")
 
 def battle(player, is_boss=False):
-    """ Handles battles, including special abilities. """
+    """ Handles battles, including loot rewards. """
     enemy = get_random_enemy(is_boss)
 
     print(f"\n⚔️ You have encountered {enemy.name}!")
@@ -65,30 +49,31 @@ def battle(player, is_boss=False):
         return
 
     player_health = player["abilities"]["Health"]["points"]
-    player_attack = player["abilities"]["Attack Power"]["points"] + player["inventory"]["weapon"]["attack_bonus"]
-    player_defense = player["inventory"]["armor"]["defense_bonus"]
-    special_ability = choose_special_ability()  # Hráč si vyberie špeciálnu schopnosť
+
+    # Select weapon
+    if player["inventory"]["weapons"]:
+        current_weapon = player["inventory"]["weapons"][-1]  # Use the last obtained weapon
+        weapon_bonus = current_weapon["value"]
+        print(f"🗡️ You are using {current_weapon['name']} (+{weapon_bonus} Attack)")
+    else:
+        weapon_bonus = 0  # No weapon bonus
+
+    player_attack = player["abilities"]["Attack Power"]["points"] + weapon_bonus
+
+    # Select armor
+    if player["inventory"]["armor"]:
+        current_armor = player["inventory"]["armor"][-1]  # Use the last obtained armor
+        armor_bonus = current_armor["value"]
+        print(f"🛡️ You are wearing {current_armor['name']} (+{armor_bonus} Defense)")
+    else:
+        armor_bonus = 0  # No armor bonus
+
+    player_defense = armor_bonus
 
     print(f"\n⚔️ {player['name']} engages in battle with {enemy.name}!")
     time.sleep(1)
 
     while player_health > 0 and enemy.health > 0:
-        # Random activation of special ability (25% chance)
-        if random.random() < 0.25:
-            if special_ability["effect"] == "double_attack":
-                print("💥 Your Power Strike activated! You deal double damage!")
-                player_attack *= 2
-            elif special_ability["effect"] == "reduce_damage":
-                print("🛡️ Your Defensive Stance activated! You take half damage this turn!")
-                player_defense *= 2
-            elif special_ability["effect"] == "extra_hit":
-                print("⚡ Your Frenzy activated! You attack twice this turn!")
-                extra_attack = random.randint(1, player_attack)
-                enemy.health -= extra_attack
-                print(f"💥 Extra hit! {enemy.name} takes {extra_attack} damage!")
-            time.sleep(1)
-
-        # Player attacks
         damage = random.randint(1, player_attack)
         enemy.health -= damage
         print(f"💥 You hit {enemy.name} for {damage} damage! {enemy.name} has {max(0, enemy.health)} HP left.")
@@ -99,10 +84,13 @@ def battle(player, is_boss=False):
             time.sleep(1)
             player["gold"] += enemy.gold_reward
             player["xp"] += enemy.xp_reward
+
+            loot = award_loot(player)  # Player receives loot
+            print(f"🎁 {player['name']} received: {loot['name']}!")
+
             return
 
-        # Enemy attacks
-        enemy_damage = max(0, enemy.attack() - player_defense)  # Armor reduces damage
+        enemy_damage = max(0, enemy.attack() - player_defense)
         player_health -= enemy_damage
         print(f"🔥 {enemy.name} hits you for {enemy_damage} damage! You have {max(0, player_health)} HP left.")
         time.sleep(1)
