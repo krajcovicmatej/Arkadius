@@ -80,6 +80,84 @@ def level_up(player):
         return True
 
     return False
+def use_item(player):
+    """ Allows the player to use healing potions from the inventory. """
+    potions = player["inventory"]["potions"]
+
+    if not potions:
+        print("❌ You have no potions to use.")
+        return
+
+    print("\n🧪 Your potions:")
+    for idx, potion in enumerate(potions, start=1):
+        print(f"{idx} - {potion['name']} (+{potion['value']} HP)")
+
+    choice = input("Enter the number of the potion to use (or 0 to cancel): ")
+
+    if choice.isdigit():
+        choice = int(choice)
+        if 1 <= choice <= len(potions):
+            potion = potions.pop(choice - 1)  # Remove used potion from inventory
+            player["abilities"]["Health"]["points"] += potion["value"]
+            print(f"✨ You used {potion['name']} and restored {potion['value']} HP!")
+        elif choice == 0:
+            print("❌ Action canceled.")
+        else:
+            print("❌ Invalid selection.")
+    else:
+        print("❌ Invalid input.")
+
+def change_weapon(player):
+    """ Allows the player to change weapons in the inventory. """
+    weapons = player["inventory"]["weapons"]
+
+    if not weapons:
+        print("❌ You have no weapons to equip.")
+        return
+
+    print("\n🗡️ Your weapons:")
+    for idx, weapon in enumerate(weapons, start=1):
+        print(f"{idx} - {weapon['name']} (+{weapon['value']} Attack)")
+
+    choice = input("Enter the number of the weapon to equip (or 0 to cancel): ")
+
+    if choice.isdigit():
+        choice = int(choice)
+        if 1 <= choice <= len(weapons):
+            player["inventory"]["weapons"].append(player["inventory"]["weapons"].pop(choice - 1))  # Move weapon to last position
+            print(f"🔄 You equipped {weapons[-1]['name']}!")
+        elif choice == 0:
+            print("❌ Action canceled.")
+        else:
+            print("❌ Invalid selection.")
+    else:
+        print("❌ Invalid input.")
+
+def change_armor(player):
+    """ Allows the player to change armor in the inventory. """
+    armor = player["inventory"]["armor"]
+
+    if not armor:
+        print("❌ You have no armor to equip.")
+        return
+
+    print("\n🛡️ Your armor pieces:")
+    for idx, armor_piece in enumerate(armor, start=1):
+        print(f"{idx} - {armor_piece['name']} (+{armor_piece['value']} Defense)")
+
+    choice = input("Enter the number of the armor to equip (or 0 to cancel): ")
+
+    if choice.isdigit():
+        choice = int(choice)
+        if 1 <= choice <= len(armor):
+            player["inventory"]["armor"].append(player["inventory"]["armor"].pop(choice - 1))  # Move armor to last position
+            print(f"🔄 You equipped {armor[-1]['name']}!")
+        elif choice == 0:
+            print("❌ Action canceled.")
+        else:
+            print("❌ Invalid selection.")
+    else:
+        print("❌ Invalid input.")
 
 def distribute_skill_points(abilities, available_points=7):
     """ Allows the player to distribute skill points. """
