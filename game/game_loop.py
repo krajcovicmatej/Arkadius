@@ -1,6 +1,6 @@
 # game_loop.py - Controls game flow
 from game.constants import INTRO, NAME, DISTRIBUTE_ABILITIES, END
-from game.player import create_player, distribute_skill_points
+from game.player import create_player, distribute_skill_points, level_up
 from game.battle import battle
 from game.shop import shop
 from game.save_load import save_game, load_game, delete_save, list_saved_games
@@ -54,6 +54,7 @@ def game_loop():
     while True:
         print("\n⚔️ A new battle awaits!")
 
+        # Boss fight
         if player["xp"] >= 500:
             print("🔥 A dark presence looms... The Kraken is awakening!")
             result = battle(player, is_boss=True)
@@ -62,6 +63,9 @@ def game_loop():
                 break
 
         battle(player)
+
+        if level_up(player):
+            print(f"🆙 {player['name']} is now stronger and ready for new challenges!")
 
         if player["abilities"]["Health"]["points"] <= 0:
             print("\n💀 You have been defeated! Game over.")

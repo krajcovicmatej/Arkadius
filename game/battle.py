@@ -19,17 +19,21 @@ class Enemy:
         return random.randint(1, self.attack_power)
 
 
-def get_random_enemy(is_boss=False):
+def get_random_enemy(is_boss=False, player_level=1):
     """ Returns a random enemy with a special ability or a boss. """
     if is_boss:
         return Enemy("Kraken - God of Darkness", health=200, attack_power=20, xp_reward=200, gold_reward=100,
                      special_ability="Dark Abyss")
 
     enemies = [
-        Enemy("Goblin", health=30, attack_power=5, xp_reward=20, gold_reward=10, special_ability="Quick Slash"),
-        Enemy("Orc", health=50, attack_power=8, xp_reward=30, gold_reward=15, special_ability="Berserk"),
-        Enemy("Skeleton", health=25, attack_power=6, xp_reward=25, gold_reward=12, special_ability="Bone Shield"),
-        Enemy("Dark Mage", health=40, attack_power=10, xp_reward=35, gold_reward=20, special_ability="Shadow Bolt")
+        Enemy("Goblin", health=30 + (player_level * 5), attack_power=5 + (player_level * 2),
+              xp_reward=20 + (player_level * 5), gold_reward=10 + (player_level * 2), special_ability="Quick Slash"),
+        Enemy("Orc", health=50 + (player_level * 10), attack_power=8 + (player_level * 3),
+              xp_reward=30 + (player_level * 5), gold_reward=15 + (player_level * 3), special_ability="Berserk"),
+        Enemy("Skeleton", health=25 + (player_level * 5), attack_power=6 + (player_level * 2),
+              xp_reward=25 + (player_level * 4), gold_reward=12 + (player_level * 2), special_ability="Bone Shield"),
+        Enemy("Dark Mage", health=40 + (player_level * 8), attack_power=10 + (player_level * 4),
+              xp_reward=35 + (player_level * 6), gold_reward=20 + (player_level * 3), special_ability="Shadow Bolt")
     ]
     return random.choice(enemies)
 
@@ -41,7 +45,7 @@ def kraken_special_ability():
         ("🌑 Dark Abyss", "Kraken summons the abyss, weakening the player!", -3)
     ]
 
-    if random.random() < 0.4:  # 40% šanca na aktiváciu schopnosti
+    if random.random() < 0.4:  # 40% chance to activate ability
         ability = random.choice(abilities)
         print(f"⚡ Kraken uses {ability[0]}! {ability[1]}")
         return ability[2]
@@ -51,10 +55,11 @@ def kraken_special_ability():
 
 def battle(player, is_boss=False):
     """ Handles battles, including boss fight with Kraken. """
-    enemy = get_random_enemy(is_boss)
+    enemy = get_random_enemy(is_boss, player["level"])
 
     print(f"\n⚔️ You have encountered {enemy.name}!")
-    print(f"Stats: HP: {enemy.health}, Attack: {enemy.attack_power}, XP Reward: {enemy.xp_reward}, Gold Reward: {enemy.gold_reward}")
+    print(
+        f"Stats: HP: {enemy.health}, Attack: {enemy.attack_power}, XP Reward: {enemy.xp_reward}, Gold Reward: {enemy.gold_reward}")
     print(f"Special Ability: {enemy.special_ability}")
 
     fight_choice = input("\nDo you want to enter the fight? (1 - Yes, 2 - No): ")
@@ -65,22 +70,21 @@ def battle(player, is_boss=False):
     player_health = player["abilities"]["Health"]["points"]
 
     # Select weapon
+    weapon_bonus = 0
     if player["inventory"]["weapons"]:
         current_weapon = player["inventory"]["weapons"][-1]
         weapon_bonus = current_weapon["value"]
         print(f"🗡️ You are using {current_weapon['name']} (+{weapon_bonus} Attack)")
-    else:
-        weapon_bonus = 0
 
     player_attack = player["abilities"]["Attack Power"]["points"] + weapon_bonus
 
     # Select armor
-    if player["inventory"]["armor"]:
-        current_armor = player["inventory"]["armor"][-1]
-        armor_bonus = current_armor["value"]
-        print(f"🛡️ You are wearing {current_armor['name']} (+{armor_bonus} Defense)")
-    else:
-        armor_bonus = 0
+    armor_bonus = 0
+    if player["inventory"].get("armor"):
+        if player["inventory"]["armor"]:
+            current_armor = player["inventory"]["armor"][-1]
+            armor_bonus = current_armor["value"]
+            print(f"🛡️ You are wearing {current_armor['name']} (+{armor_bonus} Defense)")
 
     player_defense = armor_bonus
 
@@ -98,6 +102,8 @@ def battle(player, is_boss=False):
             time.sleep(1)
             player["gold"] += enemy.gold_reward
             player["xp"] += enemy.xp_reward
+            loot = award_loot(player)
+            print(f"🎁 You received: {loot['name']}!")
 
             if is_boss:
                 print("🎉 Congratulations! You have defeated Kraken and saved the world!")

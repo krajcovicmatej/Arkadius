@@ -1,4 +1,6 @@
 # player.py - Handles player creation and attributes
+from game.loot import award_loot  # Import pre loot systém
+
 def choose_warrior_name():
     while True:
         name = input("Enter your warrior's name: ")
@@ -20,38 +22,7 @@ def define_warrior_abilities():
         "Health": {"points": 50, "description": "Represents your life points in battle."},
         "Luck": {"points": 1, "description": "Influences critical hit rates and rare loot drops."}
     }
-def create_player():
-    """ Creates a player with initial attributes including gold, XP, level, and inventory. """
-    return {
-        "name": choose_warrior_name(),
-        "abilities": define_warrior_abilities(),
-        "gold": 0,
-        "xp": 0,
-        "level": 1,
-        "inventory": {
-            "weapons": [],
-            "armor": [],
-            "potions": [],
-            "special": []
-        }
-    }
 
-
-
-def check_level_up(player):
-    """ Checks if the player has enough XP to level up. """
-    level = player["level"]
-    xp_needed = level * 50  # XP required for next level (50 XP per level)
-
-    if player["xp"] >= xp_needed:
-        player["level"] += 1
-        player["xp"] -= xp_needed  # Remove XP used for leveling up
-        print(f"\n🎉 {player['name']} leveled up to Level {player['level']}!")
-
-        # Give player extra ability points
-        bonus_points = 3
-        print(f"You received {bonus_points} ability points to distribute!")
-        distribute_skill_points(player["abilities"], bonus_points)
 def choose_special_ability():
     """ Allows the player to choose a special ability. """
     abilities = {
@@ -72,9 +43,46 @@ def choose_special_ability():
         else:
             print("Invalid choice! Please enter a valid number.")
 
+def create_player():
+    """ Creates a player with initial attributes including gold, XP, level, and inventory. """
+    return {
+        "name": choose_warrior_name(),
+        "abilities": define_warrior_abilities(),
+        "special_ability": choose_special_ability(),  # Hráč si vyberie špeciálnu schopnosť pri vytvorení
+        "gold": 0,
+        "xp": 0,
+        "level": 1,
+        "inventory": {
+            "weapons": [],
+            "armor": [],
+            "potions": [],
+            "special": []
+        }
+    }
 
-def distribute_skill_points(abilities):
-    available_points = 7
+def level_up(player):
+    """ Increases the player's level when enough XP is collected. """
+    xp_needed = player["level"] * 100  # XP required for next level
+
+    if player["xp"] >= xp_needed:
+        player["level"] += 1
+        player["xp"] -= xp_needed
+
+        print(f"\n🎉 Level Up! {player['name']} is now level {player['level']}!")
+
+        # Bonusy pri levelovaní
+        player["abilities"]["Health"]["points"] += 5
+        player["abilities"]["Attack Power"]["points"] += 2
+        player["gold"] += 50  # Extra zlato
+        loot = award_loot(player)  # Extra loot
+        print(f"💰 You received 50 gold and a special reward: {loot['name']}!")
+
+        return True
+
+    return False
+
+def distribute_skill_points(abilities, available_points=7):
+    """ Allows the player to distribute skill points. """
     while available_points > 0:
         print(f"\nYou have {available_points} skill points to distribute.")
         print("Choose an ability to improve:")
