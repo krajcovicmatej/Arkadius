@@ -6,14 +6,12 @@ from game.shop import shop
 from game.save_load import save_game, load_game, delete_save, list_saved_games
 import os
 
-
-
 def game_loop():
     """ Main game loop controlling the flow of the game. """
     player = None
 
     while True:
-        print("\n📂 Welcome to the Arkadius --> Text Adventure RPG!")
+        print("\n📂 Welcome to Arkadius --> Text Adventure RPG!")
         print("You will create your own warrior and fight against powerful monsters.")
         print("1 - Start New Game")
         print("2 - Load Saved Game")
@@ -55,13 +53,20 @@ def game_loop():
 
     while True:
         print("\n⚔️ A new battle awaits!")
+
+        if player["xp"] >= 500:
+            print("🔥 A dark presence looms... The Kraken is awakening!")
+            result = battle(player, is_boss=True)
+            if result == "boss_defeated":
+                print("🎉 You have completed your journey! Congratulations!")
+                break
+
         battle(player)
 
         if player["abilities"]["Health"]["points"] <= 0:
             print("\n💀 You have been defeated! Game over.")
             delete_save(player["name"])
             break
-
 
         print("\n🛒 Do you want to visit the shop?")
         shop_choice = input("1 - Yes, 2 - No: ")
@@ -84,8 +89,3 @@ def game_loop():
 
     print(f"\nGame Over. You finished with {player['gold']} gold, {player['xp']} XP, reached level {player['level']}.")
     print("Thank you for playing! 👋")
-
-
-
-
-
