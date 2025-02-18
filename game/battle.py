@@ -1,10 +1,8 @@
 import random
 import time
 
-
 class Enemy:
     """ Represents an enemy with health, attack power, and special ability. """
-
     def __init__(self, name, health, attack_power, xp_reward, gold_reward, special_ability):
         self.name = name
         self.health = health
@@ -16,7 +14,6 @@ class Enemy:
     def attack(self):
         """ Returns the enemy's attack damage. """
         return random.randint(1, self.attack_power)
-
 
 def get_random_enemy(is_boss=False):
     """ Returns a random enemy with a special ability or a boss. """
@@ -31,7 +28,6 @@ def get_random_enemy(is_boss=False):
         Enemy("Dark Mage", health=40, attack_power=10, xp_reward=35, gold_reward=20, special_ability="Shadow Bolt")
     ]
     return random.choice(enemies)
-
 
 def choose_special_ability():
     """ Allows the player to choose a special battle ability. """
@@ -53,7 +49,6 @@ def choose_special_ability():
             return abilities[choice]
         else:
             print("Invalid choice! Please enter a valid number.")
-
 
 def battle(player, is_boss=False):
     """ Handles battles, including special abilities. """
