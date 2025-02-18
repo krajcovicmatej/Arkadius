@@ -20,6 +20,7 @@ def define_warrior_abilities():
         "Agility": {"points": 1, "description": "Affects dodge chances and attack speed."},
         "Skill": {"points": 1, "description": "Increases critical hit chances and accuracy."},
         "Health": {"points": 50, "description": "Represents your life points in battle."},
+        "Mana": {"points": 20, "description": "Allows you to use magical abilities in battle."},
         "Luck": {"points": 1, "description": "Influences critical hit rates and rare loot drops."}
     }
 
@@ -80,6 +81,7 @@ def level_up(player):
         return True
 
     return False
+
 def use_item(player):
     """ Allows the player to use healing potions from the inventory. """
     potions = player["inventory"]["potions"]
